@@ -32,7 +32,7 @@
 │   ├── /css
 │   │   └── style.css
 │   ├── /fonts
-│   │   └── myfont.woff
+│   │   └── any font source
 │   ├── /images
 │   │   └── logo.png
 │   └── /js
