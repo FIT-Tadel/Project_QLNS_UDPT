@@ -1,0 +1,14 @@
+[
+    {
+        "_id": "1",
+        "clientId": "133230",
+        "clientSecret": "b3afc2ad91fe84b88794ba38124df5036fc7e579",
+        "refreshToken": "7734c6912852cc7619022236cf66c1735823a79f"
+    },
+    {
+        "_id": "user123",
+        "clientId": "131642",
+        "clientSecret": "177e470639811c7ceea0c1002ca1a4d01174e26e",
+        "refreshToken": "33797ed0c94743bc0b11697dda9467eb0a55418b"
+    }
+]
