@@ -56,7 +56,7 @@
         <!-- duplicate or remove this li tag if you want to add or remove navlink with submenu -->
         <!-- start -->
         <li class="item">
-          <div href="#" class="nav_link submenu_item" data-target="check-in-out-request">
+          <div href="#" class="nav_link submenu_item" data-target="checkin-calendar">
             <span class="navlink_icon">
               <i class="bx bx-home-alt"></i>
             </span>

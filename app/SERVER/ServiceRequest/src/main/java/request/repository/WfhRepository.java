@@ -5,10 +5,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 
-import request.model.WFH;
-import java.util.Optional;
+import request.model.Wfh;
 
-public interface WfhRepository extends CrudRepository<WFH, Integer> {
+import java.util.List;
+
+public interface WfhRepository extends CrudRepository<Wfh, Integer> {
     // CRUD methods
-    Optional<WFH> findById(Integer id);
+    @Query(value = "SELECT * FROM wfh", nativeQuery = true)
+    List<Wfh> findAll();
+
+    // Get WFH Request by EmployeeId
+    @Query(value = "SELECT * FROM wfh WHERE employee_id = ?1", nativeQuery = true)
+    List<Wfh> getWfhRequestByEmployeeId(Integer employeeId);
+
 }

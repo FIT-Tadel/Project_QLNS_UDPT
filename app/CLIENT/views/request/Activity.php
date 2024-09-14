@@ -12,7 +12,7 @@
             <div class="detail"><span class="label">Average Speed:</span> <span></span> m/s</div>
             <div class="detail"><span class="label">Max Speed:</span> <span></span> m/s</div>
         </div> -->
-        <button type="submit" class="btn solid leave-request-btn" name="view-activity">View Activities</button>
+        <input type="submit" class="btn solid" name="view-activity" value="View Activities"></input>
     </div>
     
 </form>

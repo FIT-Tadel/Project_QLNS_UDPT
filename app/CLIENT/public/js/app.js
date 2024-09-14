@@ -468,10 +468,125 @@ if (HomepageScreen) {
     }); 
 
     //------------------- 4.Check-In-Out Page -------------------
-    let camera_button = document.querySelector("#start-camera");
-    let video = document.querySelector("#video");
-    let click_button = document.querySelector("#click-photo");
-    let canvas = document.querySelector("#canvas");
+    //Check-In/Out History
+    function updateMissedCheckInsLabel(allDays) {
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0];
+      const missedDays = allDays.filter(day => day.start < today && !day.checkIn).length;
+      document.querySelector('.fc-customLabel-button').innerText = `Missed Check-In for ${missedDays} days`;
+    }
+
+    function initializeCheckInCalendar(events) {
+      var calendarEl = document.getElementById('checkin-calendar');
+      var today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0];
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'customLabel dayGridMonth'
+        },
+        customButtons: {
+          customLabel: {
+            text: 'Missed Check-In for 0 day(s)',
+            click: function() {} 
+          }
+        },
+        buttonText: {
+          today: 'Today'
+        },
+        events: events,
+        eventContent: function(arg) {
+            var htmlContent = '';
+            var eventDate = arg.event.start.toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0];
+
+            if (arg.event.extendedProps.checkIn === true) { //Checked In
+              if (arg.event.extendedProps.checkOut === true) { 
+                  htmlContent = `
+                    <div class="calendar-event-content">
+                      <span class="checked-in-icon"><i class='bx bxs-check-circle'></i> Checked</span>
+                      <span class="star-icon"><i class="bx bxs-star"></i> 50 points</span>
+                    </div>`;
+              }
+              else {
+                  htmlContent = `<div class="calendar-event-content"><span class="checked-in-icon"><i class="bx bx-log-out-circle logout-icon"></i> Check Out</span></div>`;
+              }
+            }
+            else if(eventDate < today) {    //Missed Check-In
+              htmlContent = `<div class="calendar-event-content not-checked"><span class="missed-icon"><i class='bx bxs-x-circle'></i> Missed</span></div>`;
+            }
+            else if (eventDate === today) { //Today Check-In
+              htmlContent = `<div class="calendar-event-content today-checkin"><span class="red-dot"></span>Check In Now</div>`;
+            }
+            return { html: htmlContent };
+        },
+        dateClick: function(info) {
+          if (info.dateStr === today) {
+            var events = calendar.getEvents();
+            var event = events.find(e => e.startStr === info.dateStr);
+
+            if (event && event.extendedProps.checkIn === true) {
+              if (event.extendedProps.checkOut === false) {
+                // Toggle To Check Out
+                var checkInBtn = document.querySelector('.check-in-request-btn');
+                checkInBtn.value = 'Check Out';
+                checkInBtn.classList.add('check-out');
+                checkInBtn.innerHTML = '<i class="bx bx-log-out-circle logout-icon"></i> Check Out';
+                document.getElementById('checkInModal').style.display = 'block';
+              } else { // already checked in/out
+                showMessageBox('info', 'Already Checked In/Out', 'See you tomorrow ^.^', 'green');
+              }
+            } else {
+              document.getElementById('checkInModal').style.display = 'block';
+            }
+          }
+        }, 
+      });
+      calendar.render();
+    }
+    
+    function handleCheckInHistory(checkInData) {
+      checkInData = JSON.parse(checkInData);
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+
+      let daysInMonth = today.getDate();
+      let allDays = [];
+    
+      for (let day = 1; day <= daysInMonth; day++) {
+          let dateStr = new Date(year, month, day).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0];
+          allDays.push({
+              start: dateStr,
+              checkIn: false
+          });                             
+      }
+
+      checkInData.forEach(checkIn => {
+        let checkInDate = new Date(checkIn.checkInDate).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0]; 
+        let index = allDays.findIndex(day => day.start === checkInDate);
+        if (index !== -1) {
+            allDays[index].checkIn = true;
+            allDays[index].checkOut = checkIn.checkOutTime ? true : false;
+        }
+      });
+
+      let events = allDays.map(day => ({
+          start: day.start,
+          extendedProps: {
+              checkIn: day.checkIn, 
+              checkOut: day.checkOut
+          }
+      }));
+
+      initializeCheckInCalendar(events);
+      updateMissedCheckInsLabel(allDays);
+    }
+
+    // Check-In/Out Form
+    let camera_button = document.querySelector("#start-camera-btn");
+    let video = document.querySelector("#video-webcam");
+    let click_button = document.querySelector("#click-photo-btn");
+    let canvas = document.querySelector("#canvas-checkin");
 
     function updateClock() {
       let now = new Date();
@@ -479,15 +594,27 @@ if (HomepageScreen) {
       let minutes = now.getMinutes();
       let seconds = now.getSeconds();
       let ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12;
+
       minutes = minutes < 10 ? '0' + minutes : minutes;
       seconds = seconds < 10 ? '0' + seconds : seconds;
       let timeString = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
   
-      document.getElementById('clock').textContent = timeString;
+      document.getElementById('clock-checkin').textContent = timeString;
+    }
+
+    //Close Modal
+    document.querySelector('.close').onclick = function() {
+      document.getElementById('checkInModal').style.display = 'none';
     }
     
+    window.onclick = function(event) {
+      var modal = document.getElementById('checkInModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
+    
+    //Update Clock
     setInterval(updateClock, 1000);
 
     camera_button.addEventListener('click', async function(event) {
@@ -509,19 +636,180 @@ if (HomepageScreen) {
       //Stop video stream
       video.srcObject.getVideoTracks().forEach(track => track.stop());
       video.srcObject = null;
-
-      video.src = image_data_url;
     });
 
-    // ------------------- 5.Acitivity Page -------------------
+    $(document).ready(function() {
+      $('.check-in-request-btn').click(function(event) {
+          event.preventDefault(); 
+  
+          var checkInBtn = document.querySelector('.check-in-request-btn');
+          if (checkInBtn.value === 'Check In') {
+              //New Check In
+              var checkInDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0]; 
+              //Format checkInTime - HH:MM:SS
+              var checkInTime = document.getElementById('clock-checkin').textContent.split(' ')[0].split(':').map(part => part.padStart(2, '0')).join(':');
+              var checkInImage = canvas.toDataURL('image/jpeg');
+
+              $.ajax({
+                  url: 'index.php?action=home',
+                  type: 'POST',
+                  data: {
+                      submit_ajax: 'check-in-btn',
+                      checkInDate: checkInDate,
+                      checkInTime: checkInTime,
+                      checkInImage: checkInImage
+                  },
+                  success: function(response) {
+                      if (response.includes('Check In Successfully')) {
+                        showMessageBox('success', 'Check In Successfully!', "Have a nice day at work! Don't forget to check out ^.^", 'green');
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      showMessageBox('error', 'Error found', error, 'red');
+                  }
+              });
+
+              //Toggle To Check Out
+              checkInBtn.value = 'Check Out';
+              checkInBtn.classList.add('check-out');
+              checkInBtn.innerHTML = '<i class="bx bx-log-out-circle logout-icon"></i> Check Out';
+            }
+            else {
+              //Check Out -> Update check_out_time
+              var checkOutDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh'}).split('T')[0]; 
+              var checkOutTime = document.getElementById('clock-checkin').textContent.split(' ')[0].split(':').map(part => part.padStart(2, '0')).join(':');
+
+              $.ajax({
+                  url: 'index.php?action=home',
+                  type: 'POST',
+                  data: {
+                      submit_ajax: 'check-out-btn',
+                      checkOutDate: checkOutDate,
+                      checkOutTime: checkOutTime,
+                  },
+                  success: function(response) {
+                      if (response.includes('Check Out Successfully')) {
+                        showMessageBox('success', 'Check Out Successfully!', 'See you tomorrow ^.^', 'green');
+                        document.getElementById('checkInModal').style.display = 'none';
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      showMessageBox('error', 'Error found', error, 'red');
+                  }
+              });
+            }
+            
+        });
+      }); 
+    
+    //------------------- 5.Leave Request Tab ----------------
+      //ajax request for leave request
+      $(document).ready(function() {
+        $('.leave-request-btn').click(function(e) {
+            e.preventDefault();
+
+            var leaveFrom = document.querySelector('input[name="leave-from"]').value;
+            var leaveTo = document.querySelector('input[name="leave-to"]').value;
+            var reasonLeave = document.querySelector('textarea[name="reason-leave"]').value;
+            $.ajax({
+                url: 'index.php?action=home',
+                type: 'POST',
+                data: {
+                    submit_ajax: 'leave-request-btn',
+                    leaveFrom: leaveFrom,
+                    leaveTo: leaveTo,
+                    reasonLeave: reasonLeave
+                },
+                success: function(response) {
+                    if (response.includes('Leave Request Created Successfully')) {
+                      showMessageBox('success', 'Leave Request Sended!', 'Keep track with your manager', 'green');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error found: ' + error);
+                }
+            });
+          });
+      });
+
+
+    // -------------------- 6. Update TimeSheet Tab --------------------
+    //ajax request for timesheet update
+    $(document).ready(function() {
+      $('.timesheet-request-btn').click(function(e) {
+          e.preventDefault();
+
+          var dateSelect = document.querySelector('input[name="work-date"]').value;
+          var timeIn = document.querySelector('input[name="time-in"]').value;
+          var timeOut = document.querySelector('input[name="time-out"]').value;
+          var breakStartTime = document.querySelector('input[name="break-start-time"]').value;
+          var breakEndTime = document.querySelector('input[name="break-end-time"]').value;
+          var overtimeHours = document.querySelector('input[name="overtime-hours"]').value;
+          var updateSheetReason = document.querySelector('textarea[name="update-sheet-reason"]').value;
+          $.ajax({
+              url: 'index.php?action=home',
+              type: 'POST',
+              data: {
+                  submit_ajax: 'timesheet-request-btn',
+                  dateSelect: dateSelect,
+                  timeIn: timeIn,
+                  timeOut: timeOut,
+                  breakStartTime: breakStartTime,
+                  breakEndTime: breakEndTime,
+                  overtimeHours: overtimeHours,
+                  updateSheetReason: updateSheetReason
+              },
+              success: function(response) {
+                  if (response.includes('TimeSheet Updated Successfully')) {
+                    showMessageBox('success', 'TimeSheet Updated!', 'Keep track with your manager', 'green');
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.log('Error found: ' + error);
+              }
+          });
+        });
+    });
+
+    // -------------------- 7. WFH Tab -----------------------
+    $(document).ready(function() {
+      $('.wfh-request-btn').click(function(e) {
+          e.preventDefault();
+
+          var dateSelect = document.querySelector('input[name="selected-date"]').value;
+          var wfhReason = document.querySelector('textarea[name="reason-wfh"]').value;
+          $.ajax({
+              url: 'index.php?action=home',
+              type: 'POST',
+              data: {
+                  submit_ajax: 'wfh-request-btn',
+                  dateSelect: dateSelect,
+                  wfhReason: wfhReason
+              },
+              success: function(response) {
+                  if (response.includes('WFH Request Created Successfully')) {
+                    showMessageBox('success', 'WFH Request Sended!', 'Keep track with your manager', 'green');
+                  }
+              },
+              error: function(xhr, status, error) {
+                  console.log('Error found: ' + error);
+              }
+          });
+        });
+    });
+
+
+    // ------------------- 8.Acitivity Page -------------------
     // function loadActivity(activity) {
     //   const activityTable = document.getElementById('activity');
-    //
+    
     //   activityTable.innerHTML = bodyContent;
     // }
 
-    // -------------------- 6. Reward -------------------------
+    // -------------------- 9. Reward -------------------------
     function loadVoucherList(voucherList, myVouchers) {
+
+      myVouchers = JSON.parse(myVouchers);
       const voucherTable = document.querySelector('.reward-content');
 
       // Clear existing voucher content if needed
@@ -543,7 +831,7 @@ if (HomepageScreen) {
         voucherTable.appendChild(voucherRow);
       });
 
-      // Load my vouchers
+      //Load my vouchers
       const myVoucherTable = document.querySelector('.my-vouchers-content');
       myVouchers.forEach(voucher => {
         const voucherRow = document.createElement('tr');
@@ -559,6 +847,177 @@ if (HomepageScreen) {
       });
     }
 
+    // -------------------- 10. Home -------------------------
+    var currentPage = 1;
+    var rowsPerPage = 5;
+    var totalPages = 1;
+    var paginatedData = [];
+    var currentTitle = ''; 
+
+    function displayDataWithPagination(data, title, role) {
+      currentTitle = title;
+
+      totalPages = Math.ceil(data.length / rowsPerPage);
+
+      paginatedData = [];
+      for (let i = 0; i < data.length; i += rowsPerPage) {
+          paginatedData.push(data.slice(i, i + rowsPerPage));
+      }
+
+      displayPageData(1, role);
+      updatePaginationControls();
+    }
+
+    function displayPageData(page, role) {
+        currentPage = page;
+        var tableBody = document.getElementById('table-body');
+        tableBody.innerHTML = ''; 
+    
+        
+        var currentData = paginatedData[page - 1];
+        var isManager = role === 'manager';
+  
+        currentData.forEach(function(item, index) {
+            var row = document.createElement('tr');
+    
+            var cell1 = document.createElement('td');
+            cell1.innerHTML = (index + 1) + (rowsPerPage * (currentPage - 1)); 
+            row.appendChild(cell1);
+    
+            var cell2 = document.createElement('td');
+            cell2.innerHTML = formatItemData(item);
+            row.appendChild(cell2);
+
+            // If the user is a Manager, add the Action column with Edit and View buttons
+            if (isManager) {
+                var actionCell = document.createElement('td');
+                actionCell.innerHTML = `
+                    <button class="request-edit-btn" onclick="editRequest(${item.id})">Edit</button>
+                    <button class="request-view-btn" onclick="viewRequest(${item.id})">View</button>
+                `;
+                row.appendChild(actionCell);
+            }
+    
+            tableBody.appendChild(row);
+        });
+    
+        // Show the table with the correct title
+        document.querySelector('#data-table h3').innerHTML = currentTitle;
+        document.getElementById('data-table').style.display = 'block';
+    
+        // Add Action column to the header if the role is Manager
+        var tableHeader = document.querySelector('#data-table thead tr');
+        var actionHeader = document.getElementById('action-header');
+        if (isManager && !actionHeader) {
+            var actionCol = document.createElement('th');
+            actionCol.id = 'action-header';
+            actionCol.innerHTML = 'Action';
+            tableHeader.appendChild(actionCol);
+        } else if (!isManager && actionHeader) {
+            actionHeader.remove();  // Remove Action header if not a Manager
+        }
+    }
+
+    // Update pagination controls based on the current page
+    function updatePaginationControls() {
+        var pageNumbers = document.getElementById('page-numbers');
+        pageNumbers.innerHTML = `${currentPage} / ${totalPages}`;
+        
+        document.getElementById('prev-page').disabled = currentPage === 1;
+        document.getElementById('next-page').disabled = currentPage === totalPages;
+    }
+
+    // Function to change the page
+    function changePage(step) {
+        var newPage = currentPage + step;
+
+        if (newPage >= 1 && newPage <= totalPages) {
+            displayPageData(newPage);
+            updatePaginationControls();
+        }
+    }
+
+    // Helper function to format item data
+    function formatItemData(item) {
+        let formatted = '';
+        for (let key in item) {
+            formatted += `<strong>${key}:</strong> ${item[key]}<br>`;
+        }
+        return formatted;
+    }
+
+    function editRequest(requestId) {
+      console.log(`Edit request with ID: ${requestId}`);
+      showModal(requestId);
+    }
+
+    function viewRequest(requestId) {
+      console.log(`View request with ID: ${requestId}`);
+      showModal(requestId);
+    }
+
+    function showModal(requestId) {
+      var modal = document.getElementById('checkInModal');
+      modal.style.display = 'block'; 
+  
+      // Handle submit request
+      document.getElementById('response-request-btn').onclick = function() {
+          var action = document.getElementById('response-request-option').value;
+          submitRequestUpdate(requestId, action); 
+      }
+    }
+  
+    // Submit request update using AJAX
+    function submitRequestUpdate(requestId, action) {
+        $.ajax({
+            url: 'index.php?action=update-request', 
+            type: 'POST',
+            data: {
+                requestId: requestId,
+                action: action
+            },
+            success: function(response) {
+                console.log('Response:', response);
+                alert('Request has been ' + action + 'd successfully');
+                document.getElementById('checkInModal').style.display = 'none';
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+
+    function loadHomeDashboard(checkInData, leaveRequestData, timeSheetData, wfhData, role){
+      // Parse the data
+      checkInData = JSON.parse(checkInData);
+      leaveRequestData = JSON.parse(leaveRequestData);
+      timeSheetData = JSON.parse(timeSheetData);
+      wfhData = JSON.parse(wfhData);
+  
+      // Number of requests
+      document.querySelector('.checkin-box .number').innerHTML = checkInData.length;
+      document.querySelector('.leave-request-box .number').innerHTML = leaveRequestData.length;
+      document.querySelector('.update-timesheet-request-box .number').innerHTML = timeSheetData.length;
+      document.querySelector('.wfh-request-box .number').innerHTML = wfhData.length;
+  
+      // Example of loading paginated data for check-ins
+      document.querySelector('.checkin-box').onclick = function() {
+          displayDataWithPagination(checkInData, 'Check-In Data', role);
+      };
+      
+      document.querySelector('.leave-request-box').onclick = function() {
+          displayDataWithPagination(leaveRequestData, 'Leave Request Data', role);
+      };
+      
+      document.querySelector('.update-timesheet-request-box').onclick = function() {
+          displayDataWithPagination(timeSheetData, 'Update Timesheet Data', role);
+      };
+      
+      document.querySelector('.wfh-request-box').onclick = function() {
+          displayDataWithPagination(wfhData, 'WFH Request Data', role);
+      };
+    }
+    
 }
 
 // ------------------- Handle Message Box ------------------- Using SweetAlert2

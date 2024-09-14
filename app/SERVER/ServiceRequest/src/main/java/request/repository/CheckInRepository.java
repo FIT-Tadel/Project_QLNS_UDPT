@@ -1,17 +1,20 @@
 package request.repository;
 
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import request.model.CheckIn;
 
-public interface CheckInRepository extends CrudRepository<CheckIn, Integer> {
-    Optional<CheckIn> findByUsername(String username);
+import java.time.LocalDate;
+import java.util.List;
 
-    // Find max id row
-    @Query("SELECT COALESCE(MAX(c.userId), 0) FROM Credentials c")
-    Integer findMaxUserId();
-    
+public interface CheckInRepository extends CrudRepository<CheckIn, Integer> {
+    @Query(value = "SELECT * FROM checkin", nativeQuery = true)
+    List<CheckIn> findAll();
+
+    @Query(value = "SELECT * FROM checkin WHERE employee_id = ?1 AND MONTH(check_in_date) = ?2", nativeQuery = true)
+    List<CheckIn> getCheckInHistory(Integer employeeId, Integer month);
+
+    @Query(value = "SELECT * FROM checkin WHERE employee_id = ?1 AND check_in_date = ?2", nativeQuery = true)
+    CheckIn isEmployeeCheckedIn(Integer employeeId, LocalDate date);
 }

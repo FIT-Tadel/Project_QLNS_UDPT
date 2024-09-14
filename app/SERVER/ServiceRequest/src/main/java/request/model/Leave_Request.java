@@ -2,6 +2,7 @@ package request.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,26 +13,26 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "wfh")
-public class Wfh {
+@Table(name = "leave_request")
+public class Leave_Request {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     private Integer employeeId;
-    private LocalDate dateSelect;
-    private String wfhReason;
+    private LocalDate leaveFrom;
+    private LocalDate leaveTo;
+    private String reasonLeave;
 
     @Enumerated(EnumType.STRING)
-    private RequestStatus requestStatus;
+    private LeaveStatus requestStatus;
 
     private LocalDateTime createdDate;
     private LocalDateTime updatedDate;
 
-    public enum RequestStatus {
-        PENDING,
-        APPROVED,
-        REJECTED,
-        CANCELED
+    // Enum For requestStatus
+    public enum LeaveStatus {
+        PENDING, APPROVED, REJECTED, CANCELED
     }
 
     // Getters and Setters
@@ -51,27 +52,36 @@ public class Wfh {
         this.employeeId = employeeId;
     }
 
-    public LocalDate getDateSelect() {
-        return dateSelect;
+
+    public LocalDate getLeaveFrom() {
+        return leaveFrom;
     }
 
-    public void setDateSelect(LocalDate dateSelect) {
-        this.dateSelect = dateSelect;
+    public void setLeaveFrom(LocalDate leaveFrom) {
+        this.leaveFrom = leaveFrom;
     }
 
-    public String getWfhReason() {
-        return wfhReason;
+    public LocalDate getLeaveTo() {
+        return leaveTo;
     }
 
-    public void setWfhReason(String wfhReason) {
-        this.wfhReason = wfhReason;
+    public void setLeaveTo(LocalDate leaveTo) {
+        this.leaveTo = leaveTo;
     }
 
-    public RequestStatus getRequestStatus() {
+    public String getReasonLeave() {
+        return reasonLeave;
+    }
+
+    public void setReasonLeave(String reasonLeave) {
+        this.reasonLeave = reasonLeave;
+    }
+
+    public LeaveStatus getRequestStatus() {
         return requestStatus;
     }
 
-    public void setRequestStatus(RequestStatus requestStatus) {
+    public void setRequestStatus(LeaveStatus requestStatus) {
         this.requestStatus = requestStatus;
     }
 
@@ -91,22 +101,22 @@ public class Wfh {
         this.updatedDate = updatedDate;
     }
 
-    public Wfh(Integer id, Integer employeeId, LocalDate dateSelect, String wfhReason, RequestStatus requestStatus,
-            LocalDateTime createdDate, LocalDateTime updatedDate) {
+    public Leave_Request(Integer id, Integer employeeId, LocalDate leaveFrom, LocalDate leaveTo, String reasonLeave,
+            LeaveStatus requestStatus, LocalDateTime createdDate, LocalDateTime updatedDate) {
         super();
         this.id = id;
         this.employeeId = employeeId;
-        this.dateSelect = dateSelect;
-        this.wfhReason = wfhReason;
+        this.leaveFrom = leaveFrom;
+        this.leaveTo = leaveTo;
+        this.reasonLeave = reasonLeave;
         this.requestStatus = requestStatus;
         this.createdDate = createdDate;
         this.updatedDate = updatedDate;
     }
 
-    public Wfh() {
+    public Leave_Request() {
         super();
     }
-} 
-    
 
+}
 

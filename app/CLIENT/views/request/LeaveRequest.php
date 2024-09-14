@@ -5,7 +5,7 @@
         <label for="" class="leave-request-label">Leave From</label>
         <div class="input-field">
             <i class="fas fa-calendar-alt"></i>
-            <input type="date" name="start-date" required
+            <input type="date" name="leave-from" required
                                         oninvalid="this.setCustomValidity('Please enter a valid date')" 
                                         oninput="this.setCustomValidity('')"/>
         </div>
@@ -13,13 +13,13 @@
         <label for="" class="leave-request-label">Leave To</label>
         <div class="input-field">
             <i class="fas fa-calendar-alt"></i>
-            <input type="date" name="end-date" required
+            <input type="date" name="leave-to" required
                                         oninvalid="this.setCustomValidity('Please enter a valid date')" 
                                         oninput="this.setCustomValidity('')"/>
         </div>
 
         <label for="" class="leave-request-label">Reason</label>
-        <textarea name="reason" class="leave-reason" required></textarea>
+        <textarea name="reason-leave" class="leave-reason" required></textarea>
 
         <input type="submit" name="leave-request" value="Send Request" class="btn solid leave-request-btn" />
     </div>

@@ -19,6 +19,26 @@
                 $status = $user['userStatus'];
                 Helper::runScript("loadHeader('$avatar_path', '$username', '$role','$status')");
 
+                //CheckIn/CheckOut
+                $checkInData = Home::getCheckInHistory($user);
+                Home::checkIn($user);
+                Home::checkOut($user);
+
+                //Leave Request
+                $leaveRequestData = Home::getLeaveRequest($user);
+                Home::createLeaveRequest($user);
+
+                //Update TimeSheet Request
+                $timeSheetData = Home::getUpdateTimeSheetRequest($user);
+                Home::createUpdateTimeSheetRequest($user);
+
+                //WFH Request
+                $wfhData = Home::getWFHRequest($user);
+                Home::createWFHRequest($user);
+
+                //Load Home-Dashboard
+                Helper::runScript("loadHomeDashboard('$checkInData', '$leaveRequestData', '$timeSheetData', '$wfhData', '$role')");
+
                 //Load MyProfile Page
                 $name = $employee['name'];
                 $phone = $employee['phone'];
@@ -33,8 +53,8 @@
 
                 //Load Voucher List
                 $allVouchers = json_encode(Home::getVoucherList());
-                $myVouchers = json_encode(Home::getMyVouchers($user));
-                Helper::runScript("loadVoucherList($allVouchers, $myVouchers)");
+                $myVouchers = json_encode(Home::getMyVouchers($username));
+                Helper::runScript("loadVoucherList($allVouchers, '$myVouchers')");
 
                 //Update Setting
                 Home::updateStatus($username);
@@ -44,6 +64,142 @@
                 Home::changePassword($user);
             }
         }
+
+        // ------------------- FUNCTIONS ----------------------
+
+        //-------------------- CHECK IN/OUT -------------------
+        //Check In History
+        public static function getCheckInHistory($user) {
+            $url = 'request/checkin/'.$user['userId'].'/' .date('m');
+            $response = json_encode(Helper::sendRequest($url, 'GET'));
+
+            if ($response) {
+                Helper::runScript("handleCheckInHistory('$response')");
+            }
+            return $response;
+        }
+
+        //Employee Check In
+        public static function checkIn($user) {
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if(!isset($_POST['submit_ajax'])) return;
+                if($_POST['submit_ajax'] !== 'check-in-btn') return;
+
+                $url = 'request/checkin';
+                $data = [
+                    'employeeId' => $user['userId'],
+                    'checkInDate' => $_POST['checkInDate'],
+                    'checkInTime' => $_POST['checkInTime'],
+                    'confirmImagePath' => $user['userId'].'@'.$_POST['checkInDate'].'.png' //Example: 2@2024-09-03
+                ];
+                Helper::sendRequest($url, 'POST', $data);
+                echo 'Check In Successfully';
+            }
+        }
+
+        //Employee Check Out
+        public static function checkOut($user) {
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if(!isset($_POST['submit_ajax'])) return;
+                if($_POST['submit_ajax'] !== 'check-out-btn') return;
+
+                $url = 'request/checkout';
+                $data = [
+                    'employeeId' => $user['userId'],
+                    'checkInDate' => $_POST['checkOutDate'],
+                    'checkOutTime' => $_POST['checkOutTime']
+                ];
+                Helper::sendRequest($url, 'PUT', $data);
+                echo 'Check Out Successfully';
+            }
+        }
+
+        //-------------------- Leave Request -------------------
+        //Get Leave Request
+        public static function getLeaveRequest($user) {
+            $url = 'request/leave/'.$user['userId'];
+            $response = json_encode(Helper::sendRequest($url, 'GET'));
+            return $response;
+        }
+
+        //Create Leave Request
+        public static function createLeaveRequest($user) {
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if(!isset($_POST['submit_ajax'])) return;
+                if($_POST['submit_ajax'] !== 'leave-request-btn') return;
+
+                $url = 'request/leave';
+                $data = [
+                    'employeeId' => $user['userId'],
+                    'leaveFrom' => $_POST['leaveFrom'],
+                    'leaveTo' => $_POST['leaveTo'],
+                    'reasonLeave' => $_POST['reasonLeave'],
+                    'requestStatus' => 'PENDING'
+                ];
+                Helper::sendRequest($url, 'POST', $data);
+                echo 'Leave Request Created Successfully';
+            }
+        }
+
+        // ------------------- Update TimeSheet Request --------
+        //Get Update TimeSheet Request
+        public static function getUpdateTimeSheetRequest($user) {
+            $url = 'request/timesheet/'.$user['userId'];
+            $response = json_encode(Helper::sendRequest($url, 'GET'));
+
+            return $response;
+        }
+
+        //Create Update TimeSheet Request
+        public static function createUpdateTimeSheetRequest($user) {
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if(!isset($_POST['submit_ajax'])) return;
+                if($_POST['submit_ajax'] !== 'timesheet-request-btn') return;
+
+                $url = 'request/timesheet';
+                $data = [
+                    'employeeId' => $user['userId'],
+                    'dateSelect' => $_POST['dateSelect'],
+                    'timeIn' => $_POST['timeIn'],
+                    'timeOut' => $_POST['timeOut'],
+                    'breakStartTime' => $_POST['breakStartTime'],
+                    'breakEndTime' => $_POST['breakEndTime'],
+                    'overTimeHours' => $_POST['overTimeHours'],
+                    'updateSheetReason' => $_POST['updateSheetReason'],
+                    'requestStatus' => 'PENDING'
+                ];
+                Helper::sendRequest($url, 'POST', $data);
+                echo 'TimeSheet Updated Successfully';
+            }
+        }
+        // ------------------- WFH Request ---------------------
+        //Get WFH Request
+        public static function getWFHRequest($user) {
+            $url = 'request/wfh/'.$user['userId'];
+            $response = json_encode(Helper::sendRequest($url, 'GET'));
+
+            return $response;
+        }
+
+        //Create WFH Request
+        public static function createWFHRequest($user) {
+            if($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if(!isset($_POST['submit_ajax'])) return;
+                if($_POST['submit_ajax'] !== 'wfh-request-btn') return;
+
+                $url = 'request/wfh';
+                $data = [
+                    'employeeId' => $user['userId'],
+                    'dateSelect' => $_POST['dateSelect'],
+                    'wfhReason' => $_POST['wfhReason'],
+                    'requestStatus' => 'PENDING'
+                ];
+                Helper::sendRequest($url, 'POST', $data);
+                echo 'WFH Request Created Successfully';
+            }
+        }
+
+        //-------------------- PROFILE -------------------
 
         //Check if empployee profile exists
         public static function profileExists($user_id) {
@@ -123,10 +279,10 @@
         }
 
         //Get Activity
-        // public static function getActivity($username) {
-        //     $url = 'activities/user123';
-        //     return Helper::sendRequest($url, 'GET');
-        // }
+        public static function getActivity($username) {
+            $url = 'activities/user123';
+            return Helper::sendRequest($url, 'GET');
+        }
 
         //Get All Vouchers
         public static function getVoucherList() {

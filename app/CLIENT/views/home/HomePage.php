@@ -12,6 +12,11 @@
       <?php require_once "./views/request/Home.php"; ?>
     </div>
 
+     <!-- Tab: Check-In-Out -->
+     <div class ="main-content">
+      <?php require_once "./views/request/CheckIn.php"; ?>
+    </div>
+
     <!-- Tab: Search -->
     <div class ="main-content">
       <?php require_once "./views/request/Search.php"; ?>
@@ -25,11 +30,6 @@
     <!-- Tab: Reward -->
     <div class ="main-content">
       <?php require_once "./views/request/Reward.php"; ?>
-    </div>
-
-    <!-- Tab: Check-In-Out -->
-    <div class ="main-content">
-      <?php require_once "./views/request/CheckIn.php"; ?>
     </div>
 
     <!-- Tab: Request-Leave -->
@@ -66,7 +66,7 @@
     </div> 
     
     <!-- Include Footer -->
-    <?php require_once "./views/home/Footer.php"; ?>
+    <?php //require_once "./views/home/Footer.php"; ?>
 
   </div>
 </body>

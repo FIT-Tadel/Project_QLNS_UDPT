@@ -1013,10 +1013,10 @@ form.log-in-form {
 }
 
 /* Request */
+#home,
 #search,
 #activity,
 #reward,
-#check-in-out-request,
 #update-timesheet-request,
 #wfh-request,
 #leave-request {
@@ -1029,10 +1029,10 @@ form.log-in-form {
   color: var(--black-color);
 }
 
+#home.active,
 #search.active,
 #reward.active,
 #activity.active,
-#check-in-out-request.active,
 #update-timesheet-request.active,
 #wfh-request.active,
 #leave-request.active {
@@ -1043,11 +1043,75 @@ form.log-in-form {
 .leave-request-content {
   display: flex;
   flex-direction: column;
-  align-self: center;
+  align-items: center;
   justify-content: center;
   padding: 20px;
   width: 100%;
   color: #000;
+}
+
+.checkin-out-request-content {
+  display: grid;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1100px;
+  grid-template-columns: 15% 1fr 1fr;         
+}
+
+#start-camera-btn,
+#click-photo-btn {
+  display: flex;
+  background-color: var(--second-color);
+  color: white;
+  border: none;
+  font-weight: bold;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  max-width: 150px;
+  margin-bottom: 20px;  
+  grid-column: 1 / 2;
+}
+
+.check-in-request-btn.check-out {
+  background-color: red;
+}
+
+#start-camera-btn:hover,
+#click-photo-btn:hover {
+  opacity: 0.8;
+}
+
+#video-webcam,
+#canvas-checkin {
+  display: flex;
+  margin: 10px auto;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  grid-column: 2 / 3;
+}
+
+#clock-checkin {
+  font-size: 24px;
+  margin-top: 10px;
+  color: black;
+  grid-column: 1 / -1;
+}
+
+.clock-icon {
+  position: relative;
+  font-size: 50px;
+  color: black;
+  grid-column: 1 / -1;
+}
+
+.logout-icon {
+  font-size: 15px;
+  color: white;
+  vertical-align: middle;
 }
 
 .check-in-request-title,
@@ -1087,6 +1151,372 @@ input[type="date"] {
 .leave-request-btn {
   margin-top: 20px;
   grid-column: 2 / -1;
+}
+
+/* Home */
+.home-content {
+  display: flex;
+  gap: 40px;
+  padding: 80px 0px 0px 20px;
+  width: 100%;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 10px;
+  transition: transform 0.3s ease;  
+
+  text-decoration: none;
+  width: 270px;
+  height: 170px;
+  color: white;
+  
+  cursor: pointer;
+  z-index: 1;
+}
+
+.box:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.number {
+  margin: 20px 0px 0px 30px;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.box-title {
+  margin-left: 30px;
+  font-size: 1.2rem;
+}
+
+.more-info {
+  display: flex;
+  font-size: 0.9rem;
+  text-align: right;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background-color: var(--grey-color-light);
+  height: 40px;
+  border-radius: 0 0 10px 10px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.box-blue {
+  background-color: var(--primary-color);
+}
+
+.box-pink {
+  background-color: #e81e63;
+}
+
+.box-orange {
+  background-color: #ff5722;
+}
+
+.box-green {
+  background-color: #4caf50;
+}
+
+/* Table */
+.table-container {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.table-container h3 {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+table th, table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Formatting the data inside the table */
+table td {
+  vertical-align: top;
+}
+
+strong {
+  font-weight: bold;
+  color: #333;
+}
+
+/* Button in table */
+.request-edit-btn {
+  border-radius: 5px;
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 15px;
+  cursor: pointer;
+}
+
+.request-view-btn {
+  border-radius: 5px;
+  padding: 15px;
+  color: white;
+  border: none;
+  background-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.modal-content-home h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+  text-align: center;
+}
+
+/*Table Dropdown (select) */
+.modal-content-home select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  color: #333;
+  cursor: pointer;
+}
+
+.modal-content-home button {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50; 
+  
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+  margin-left: 45%;
+}
+
+.modal-content-home button:hover {
+  background-color: #45a049;  
+}
+
+
+.modal-content-home select:focus,
+.modal-content-home button:focus {
+  outline: none; 
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pagination-btn {
+  padding: 5px 10px;
+  margin: 0 5px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination-btn:hover {
+  background-color: #0056b3;
+}
+
+#page-numbers {
+  display: inline-block;
+  margin: 0 10px;
+  font-size: 16px;
+}
+
+/* CheckIn-Out */
+#checkin-calendar {
+  width: 1250px;
+  height: 600px;
+  background-color: var(--white-color);
+  border: solid 2px var(--grey-color-light);
+  opacity: 0;
+}
+
+#checkin-calendar.active {
+  opacity: 1;
+}
+
+.fc-daygrid-event {
+  background: none; /* Clear default */
+  border: none; /* Clear border */
+}
+
+#calendar-title {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: var(--white-color);
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--second-color) 100%);
+}
+
+.calendar-event-content {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  font-weight: bold;
+  background-color: green;
+  font-size: 14px;
+  padding: 3px 5px;
+}
+
+.calendar-event-content.not-checked {
+  background-color: red;
+  opacity: 0.6;
+}
+
+.calendar-event-content.today-checkin {
+  border: 2px solid green;
+  background-color: white;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.5);
+  border-radius: 5px; 
+  color: green; 
+}
+
+.red-dot {
+  padding: 5px;
+  background-color: red;
+  border-radius: 50%;
+  border: solid 3px white;
+  position: absolute;
+  top: -25px;
+  left: 5px;
+}
+
+.checked-in-icon {
+  font-size: 1em;
+  color: white;
+}
+
+.star-icon {
+  color: rgb(220, 189, 13);
+}
+
+/* CSS For Calendar */
+.fc-daygrid-day { 
+  background-color: white; 
+}
+
+.fc-day-today {
+  background-color: var(--primary-color); 
+  opacity: 1; 
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+  height: 100%;
+}
+
+.fc-day-today:hover {
+  background-color: grey; 
+  opacity: 0.5; 
+  cursor: pointer;
+}
+
+.fc-day-past {
+  background-color: var(--grey-color-light); 
+  opacity: 0.6;
+}
+
+.fc-day-future {
+  background-color: white; 
+}
+
+.fc-toolbar-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  padding-top: 70px;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+  animation: fadeIn 0.5s;         
+}
+
+.modal-content {
+  padding: 20px 20px 0px 0px;
+  margin: 50px 280px;
+  width: 80%;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.6s;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0%);
+  }
 }
 
 /* TimeSheet */

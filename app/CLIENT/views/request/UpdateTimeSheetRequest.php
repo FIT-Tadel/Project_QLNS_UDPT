@@ -15,7 +15,7 @@
         <!-- Time In -->
         <label for="time-in" class="time-sheet-label">Time In</label>
         <div class="input-field">
-            <input type="time" name="time-in" id="time-in" value="08:00" required 
+            <input type="time" name="time-in" id="time-in" value="08:00:00" required 
                    oninvalid="this.setCustomValidity('Please enter a valid time in')" 
                    oninput="this.setCustomValidity('')"/>
         </div>
@@ -23,7 +23,7 @@
         <!-- Time Out -->
         <label for="time-out" class="time-sheet-label">Time Out</label>
         <div class="input-field">
-            <input type="time" name="time-out" id="time-out" value="17:00" required 
+            <input type="time" name="time-out" id="time-out" value="17:00:00" required 
                    oninvalid="this.setCustomValidity('Please enter a valid time out')" 
                    oninput="this.setCustomValidity('')"/>
         </div>
@@ -31,14 +31,14 @@
         <!-- Break Start Time -->
         <label for="break-start-time" class="time-sheet-label">Break Start Time</label>
         <div class="input-field">
-            <input type="time" name="break-start-time" value="12:00" id="break-start-time" 
+            <input type="time" name="break-start-time" value="12:00:00" id="break-start-time" 
                    oninput="this.setCustomValidity('')"/>
         </div>
 
         <!-- Break End Time -->
         <label for="break-end-time" class="time-sheet-label">Break End Time</label>
         <div class="input-field">
-            <input type="time" name="break-end-time" value="13:30" id="break-end-time" 
+            <input type="time" name="break-end-time" value="13:30:00" id="break-end-time" 
                    oninput="this.setCustomValidity('')"/>
         </div>
 
@@ -50,11 +50,11 @@
                    placeholder="Enter overtime hours" oninput="this.setCustomValidity('')"/>
         </div>
 
-        <!-- Overtime Reason -->
-        <label for="overtime-reason" class="time-sheet-label">Overtime Reason</label>
-        <textarea name="overtime-reason" id="overtime-reason" class="time-sheet-reason"></textarea>
+        <!-- Updatesheet Reason -->
+        <label for="update-reason" class="time-sheet-label">Update Reason</label>
+        <textarea name="update-sheet-reason" id="update-reason" class="update-sheet-reason"></textarea>
 
         <!-- Submit Button -->
-        <input type="submit" name="update-time-sheet" value="Update Time Sheet" class="btn solid time-sheet-btn" />
+        <input type="submit" name="update-time-sheet" value="Update Time Sheet" class="btn solid timesheet-request-btn" />
     </div>
 </form>

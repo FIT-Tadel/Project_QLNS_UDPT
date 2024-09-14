@@ -11,7 +11,7 @@
         </div>
 
         <label for="" class="wfh-request-label">Reason</label>
-        <textarea name="reason" class="wfh-reason" required></textarea>
+        <textarea name="reason-wfh" class="wfh-reason" required></textarea>
 
 
         <input type="submit" name="wfh-request" value="Send Request" class="btn solid wfh-request-btn" />
